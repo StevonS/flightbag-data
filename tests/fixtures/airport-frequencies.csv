@@ -1,0 +1,4 @@
+"id","airport_ref","airport_ident","type","description","frequency_mhz"
+20,1,"CYXU","TWR","LONDON TWR",119.4
+21,1,"CYXU","ATIS","ATIS",127.15
+22,1,"CYXU","GND","",bad

@@ -1,0 +1,11 @@
+{"type":"FeatureCollection","features":[
+{"type":"Feature","properties":{"NAME":"DETROIT CLASS B","IDENT":"DTW","CLASS":"B","LOCAL_TYPE":"CLASS_B","UPPER_VAL":"10000","UPPER_UOM":"FT","UPPER_CODE":"MSL","LOWER_VAL":"0","LOWER_UOM":"FT","LOWER_CODE":"SFC"},
+ "geometry":{"type":"Polygon","coordinates":[[[-83.5,42.1],[-83.2,42.1],[-83.2,42.3],[-83.5,42.3],[-83.5,42.1]]]}},
+{"type":"Feature","properties":{"NAME":"DETROIT CLASS B","IDENT":"DTW","CLASS":"B","LOCAL_TYPE":"CLASS_B","UPPER_VAL":"10000","UPPER_UOM":"FT","UPPER_CODE":"MSL","LOWER_VAL":"3000","LOWER_UOM":"FT","LOWER_CODE":"MSL"},
+ "geometry":{"type":"MultiPolygon","coordinates":[[[[-83.7,42.0],[-83.0,42.0],[-83.0,42.4],[-83.7,42.4],[-83.7,42.0]],[[-83.5,42.1],[-83.2,42.1],[-83.2,42.3],[-83.5,42.1]]]]}},
+{"type":"Feature","properties":{"name":"PONTIAC CLASS D","class":"D","local_type":"CLASS_D","upper_val":"3500","upper_uom":"FT","upper_code":"MSL","lower_val":"0","lower_code":"SFC"},
+ "geometry":{"type":"Polygon","coordinates":[[[-83.45,42.65],[-83.38,42.65],[-83.38,42.70],[-83.45,42.70],[-83.45,42.65]]]}},
+{"type":"Feature","properties":{"NAME":"SOME CLASS E","CLASS":"E","LOCAL_TYPE":"CLASS_E5","LOWER_VAL":"700","LOWER_CODE":"AGL"},
+ "geometry":{"type":"Polygon","coordinates":[[[-84,42],[-83,42],[-83,43],[-84,42]]]}},
+{"type":"Feature","properties":{"NAME":"NO GEOMETRY","CLASS":"C"},"geometry":null}
+]}

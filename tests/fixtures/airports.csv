@@ -1,0 +1,7 @@
+"id","ident","type","name","latitude_deg","longitude_deg","elevation_ft","continent","iso_country","iso_region","municipality","scheduled_service","icao_code","iata_code","gps_code","local_code","home_link","wikipedia_link","keywords"
+1,"CYXU","medium_airport","London International Airport",43.035599,-81.1539,912,"NA","CA","CA-ON","London","yes","CYXU","YXU","CYXU","","","",""
+2,"CPZ9","small_airport","Ridgetown Airport",42.4339,-81.8606,642,"NA","CA","CA-ON","Ridgetown","no","","","","CPZ9","","",""
+3,"KDTW","large_airport","Detroit Metropolitan Wayne County Airport",42.212398,-83.353401,645,"NA","US","US-MI","Detroit","yes","KDTW","DTW","KDTW","DTW","","",""
+4,"US-1234","heliport","Hospital Heliport",42.3,-83.0,600,"NA","US","US-MI","Detroit","no","","","","","","",""
+5,"EGLL","large_airport","London Heathrow",51.47,-0.4543,83,"EU","GB","GB-ENG","London","yes","EGLL","LHR","EGLL","","","",""
+6,"KXXX","closed","Closed Field",40,-80,1000,"NA","US","US-PA","","no","","","","","","",""

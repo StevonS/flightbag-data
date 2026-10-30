@@ -1,0 +1,143 @@
+name: Build data
+
+# Converts FAA sectionals to MBTiles and builds airport and airspace data,
+# then publishes everything as a GitHub release with a manifest.json.
+#
+# Scheduled runs build once per 28-day AIRAC cycle. Manual runs can build a
+# subset of charts (published as a prerelease, so the app ignores it).
+
+on:
+  schedule:
+    - cron: "17 7 * * *" # daily; skips if this cycle is already published
+  workflow_dispatch:
+    inputs:
+      charts:
+        description: "Charts to build: 'all' or a comma-separated list (e.g. Detroit,Lake_Huron)"
+        default: all
+      force:
+        description: Rebuild even if this cycle is already published
+        type: boolean
+        default: false
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-data-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pytest
+      - run: python -m pytest -q tests
+
+  plan:
+    needs: test
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    outputs:
+      build: ${{ steps.plan.outputs.build }}
+      tag: ${{ steps.plan.outputs.tag }}
+      full: ${{ steps.plan.outputs.full }}
+      date: ${{ steps.plan.outputs.date }}
+      edition: ${{ steps.plan.outputs.edition }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          export RELEASE_TAGS="$(gh release list -R "$GITHUB_REPOSITORY" --limit 100 --json tagName --jq '.[].tagName' || true)"
+          python -m pipeline.plan "${{ inputs.charts || 'all' }}" "${{ inputs.force || false }}"
+
+  chart:
+    needs: plan
+    if: needs.plan.outputs.build == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 16
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install GDAL
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gdal-bin >/dev/null
+          gdalinfo --version
+      - name: Build ${{ matrix.chart }}
+        run: python3 -m pipeline.build_chart "${{ matrix.chart }}" "${{ needs.plan.outputs.edition }}" out
+      - uses: actions/upload-artifact@v7
+        with:
+          name: chart-${{ matrix.chart }}
+          path: out/
+          retention-days: 3
+          compression-level: 0 # WebP tiles do not compress further
+
+  datasets:
+    needs: plan
+    if: needs.plan.outputs.build == 'true'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download sources
+        run: |
+          mkdir -p src
+          for f in airports.csv runways.csv airport-frequencies.csv; do
+            curl -fsSL --retry 3 -o "src/$f" "https://davidmegginson.github.io/ourairports-data/$f"
+          done
+          curl -fsSL --retry 3 -o src/class_airspace.geojson \
+            "https://opendata.arcgis.com/datasets/c6a62360338e408cb1512366ad61559e_0.geojson"
+          ls -la src
+      - run: python -m pipeline.build_airports src out
+      - run: python -m pipeline.build_airspace src/class_airspace.geojson out
+      - uses: actions/upload-artifact@v7
+        with:
+          name: datasets
+          path: out/
+          retention-days: 3
+
+  publish:
+    needs: [plan, chart, datasets]
+    # Publish whatever succeeded; a chart that failed is simply absent.
+    if: always() && needs.plan.outputs.build == 'true' && needs.datasets.result == 'success'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          path: out
+          merge-multiple: true
+      - name: Write manifest
+        run: python3 -m pipeline.manifest out "${{ needs.plan.outputs.tag }}" "${{ needs.plan.outputs.date }}"
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.plan.outputs.tag }}
+        run: |
+          gh release delete "$TAG" --cleanup-tag --yes 2>/dev/null || true
+          flags=()
+          if [[ "${{ needs.plan.outputs.full }}" != "true" ]]; then
+            flags+=(--prerelease)
+          else
+            flags+=(--latest)
+          fi
+          count=$(python3 -c "import json;print(len(json.load(open('out/manifest.json'))['charts']))")
+          gh release create "$TAG" "${flags[@]}" \
+            --title "Data $TAG ($count charts)" \
+            --notes "FAA sectional charts (edition ${{ needs.plan.outputs.edition }}), US Class B/C/D airspace and CA/US airports. Not for primary navigation." \
+            out/manifest.json out/*.mbtiles out/*.json.gz
