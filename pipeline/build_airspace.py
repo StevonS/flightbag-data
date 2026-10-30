@@ -19,6 +19,10 @@ SOURCE_URL = (
 )
 CLASSES = {"B", "C", "D"}
 PRECISION = 5  # decimal degrees, about 1 m
+# Douglas-Peucker tolerance in degrees (about 20 m). The source draws arcs
+# with thousands of points; this keeps boundaries well within a line width
+# on a sectional while shrinking the file about tenfold.
+TOLERANCE = 0.0002
 
 
 def _get(props: dict, *names: str):
@@ -65,13 +69,53 @@ def limit(props: dict, side: str) -> dict:
     return {"ft": int(round(feet)), "ref": ref}
 
 
+def _perpendicular_sq(p, a, b) -> float:
+    """Squared distance from point p to segment a-b (planar degrees)."""
+    (px, py), (ax, ay), (bx, by) = p, a, b
+    dx, dy = bx - ax, by - ay
+    if dx == 0 and dy == 0:
+        return (px - ax) ** 2 + (py - ay) ** 2
+    t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)))
+    return (px - ax - t * dx) ** 2 + (py - ay - t * dy) ** 2
+
+
+def simplify(points: list, tolerance: float) -> list:
+    """Douglas-Peucker simplification, iterative. Keeps both end points."""
+    if len(points) < 3:
+        return list(points)
+    keep = [False] * len(points)
+    keep[0] = keep[-1] = True
+    tol_sq = tolerance * tolerance
+    stack = [(0, len(points) - 1)]
+    while stack:
+        first, last = stack.pop()
+        worst, index = 0.0, -1
+        for i in range(first + 1, last):
+            d = _perpendicular_sq(points[i], points[first], points[last])
+            if d > worst:
+                worst, index = d, i
+        if index != -1 and worst > tol_sq:
+            keep[index] = True
+            stack.append((first, index))
+            stack.append((index, last))
+    return [p for p, k in zip(points, keep) if k]
+
+
 def _round_ring(ring: list) -> list:
+    points = [(float(lon), float(lat)) for lon, lat, *_ in ring]
+    # Simplify the two halves separately so a closed ring keeps its shape.
+    mid = len(points) // 2
+    simplified = simplify(points[: mid + 1], TOLERANCE)[:-1] + simplify(
+        points[mid:], TOLERANCE
+    )
     out = []
-    for lon, lat, *_ in ring:
+    for lon, lat in simplified:
         point = [round(lon, PRECISION), round(lat, PRECISION)]
         if not out or out[-1] != point:
             out.append(point)
-    return out
+    if out and out[0] != out[-1]:
+        out.append(out[0])
+    return out if len(out) >= 4 else []
 
 
 def polygons(geometry: dict) -> list[list]:
@@ -86,7 +130,12 @@ def polygons(geometry: dict) -> list[list]:
         groups = coords
     else:
         return []
-    return [[_round_ring(r) for r in poly if len(r) >= 4] for poly in groups]
+    result = []
+    for poly in groups:
+        rings = [_round_ring(r) for r in poly if len(r) >= 4]
+        if rings and rings[0]:  # drop polygons whose outer ring collapsed
+            result.append([r for r in rings if r])
+    return result
 
 
 def build(geojson_path: Path, out_dir: Path) -> dict:

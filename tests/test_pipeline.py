@@ -226,3 +226,27 @@ def test_manifest(tmp_path):
     assert airports["effective"] == "2026-10-29"
     assert airports["expires"] == "2026-11-26"
     assert json.loads((tmp_path / "manifest.json").read_text()) == result
+
+
+def test_simplify_keeps_shape_and_drops_collinear_points():
+    line = [(x / 100, 0.0) for x in range(101)]  # straight: 101 points
+    assert build_airspace.simplify(line, 0.0002) == [(0.0, 0.0), (1.0, 0.0)]
+
+    corner = [(0.0, 0.0), (0.5, 0.0), (1.0, 0.0), (1.0, 0.5), (1.0, 1.0)]
+    assert build_airspace.simplify(corner, 0.0002) == [
+        (0.0, 0.0),
+        (1.0, 0.0),
+        (1.0, 1.0),
+    ]
+
+
+def test_rings_stay_closed_after_simplification():
+    import math
+
+    circle = [
+        [math.cos(t / 500 * 2 * math.pi) * 0.1, math.sin(t / 500 * 2 * math.pi) * 0.1]
+        for t in range(501)
+    ]
+    ring = build_airspace._round_ring(circle)
+    assert ring[0] == ring[-1]
+    assert 20 < len(ring) < 200
