@@ -101,8 +101,33 @@ jobs:
           curl -fsSL --retry 3 -o src/class_airspace.geojson \
             "https://opendata.arcgis.com/datasets/c6a62360338e408cb1512366ad61559e_0.geojson"
           ls -la src
+      - name: Download the Designated Airspace Handbook (Canada)
+        id: dah
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils >/dev/null
+          edition="${{ needs.plan.outputs.edition }}"
+          # The DAH follows the 56-day chart cycle; fall back one cycle if
+          # the new edition is not posted yet.
+          for d in "$edition" "$(date -u -d "$edition - 56 days" +%F)"; do
+            url="https://www.navcanada.ca/en/dah${d//-/}.pdf"
+            if curl -fsSL --retry 3 -A "Mozilla/5.0 FlightBag-data" -o src/dah.pdf "$url" \
+                && head -c 4 src/dah.pdf | grep -q '%PDF'; then
+              pdftotext -layout src/dah.pdf src/dah.txt
+              echo "Using $url"
+              echo "found=true" >> "$GITHUB_OUTPUT"
+              break
+            fi
+          done
       - run: python -m pipeline.build_airports src out
-      - run: python -m pipeline.build_airspace src/class_airspace.geojson out
+      - name: Build airspace
+        run: |
+          if [[ "${{ steps.dah.outputs.found }}" == "true" ]]; then
+            python -m pipeline.build_dah src/dah.txt src/dah.json
+            python -m pipeline.build_airspace src/class_airspace.geojson out src/dah.json
+          else
+            echo "::warning::DAH not available; Canadian airspace left out"
+            python -m pipeline.build_airspace src/class_airspace.geojson out
+          fi
       - uses: actions/upload-artifact@v7
         with:
           name: datasets
@@ -139,5 +164,5 @@ jobs:
           count=$(python3 -c "import json;print(len(json.load(open('out/manifest.json'))['charts']))")
           gh release create "$TAG" "${flags[@]}" \
             --title "Data $TAG ($count charts)" \
-            --notes "FAA sectional charts (edition ${{ needs.plan.outputs.edition }}), US Class B/C/D airspace and CA/US airports. Not for primary navigation." \
+            --notes "FAA sectional charts (edition ${{ needs.plan.outputs.edition }}), US Class B/C/D airspace, Canadian control zones and Class F areas (DAH), and CA/US airports. Not for primary navigation." \
             out/manifest.json out/*.mbtiles out/*.json.gz

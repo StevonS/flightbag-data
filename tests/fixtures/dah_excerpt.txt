@@ -1,0 +1,156 @@
+                                                           3.3.4      CONTROL ZONES
+                                                           3.3.4-7    Moose Jaw, SK:
+                                                                      The airspace to 8000´ (6100´ AAE) within the area bounded by a line beginning at:
+Source of Canadian Airspace Data © 2026 Transport Canada
+
+
+
+
+                                                           3.3.4-8
+                                                                            N50°26'10.00" W105°45'31.00"          TransCanada Hwy \ to
+                                                                            N50°25'29.00" W105°43'12.00"          TransCanada Hwy \ to
+                                                                            N50°25'33.00" W105°31'58.00"          TransCanada Hwy \ to
+                                                                            N50°23'41.00" W105°28'12.00"          TransCanada Hwy \ to
+                                                                            N50°23'50.00" W105°19'12.00"          thence clockwise along the arc of a circle of
+                                                                            10 miles                              radius centred on
+                                                                            N50°19'49.00" W105°33'33.00"          (Moose Jaw/Air Vice Marshall C.M. McEwen, SK - AD) \ to
+                                                                            N50°26'10.00" W105°45'31.00"          point of beginning
+
+                                                           3.3.5      TRANSPONDER AIRSPACE
+                                                           3.4.4      CONTROL ZONES
+
+                                                           3.4.4-1    Class C
+                                                           3.4.4-2    Kitchener/Waterloo, ON:
+                                                           3.4.4-3    The airspace to 4000´ (2900´ AAE) within the area bounded by a circle of 5 miles radius centred on the following:
+                                                                            N43°27'39.00" W080°22'43.00"          (Kitchener/Waterloo, ON - AD)
+
+
+                                                           3.4.4-4    London, ON:
+                                                           3.4.4-5    The airspace to 3000´ (2100´ AAE) within the area bounded by a circle of 5 miles radius centred on the following:
+                                                                            N43°01'58.80" W081°09'04.20"          (London, ON - AD)
+
+
+
+
+                                                                                                                      83
+                                                                                                                                                DAH    September 21, 2026 10:36 am
+                                                           TORONTO FLIGHT INFORMATION REGION                                                                         CONTROL ZONES
+
+
+                                                           3.4.4-6    Toronto/Billy Bishop Toronto City Airport, ON:
+© 2026 His Majesty the King in Right of Canada
+
+
+
+
+                                                           3.4.4-7    The airspace to 2500´ (2200´ AAE) within the area bounded by a line beginning at:
+                                                                            N43°32'41.36" W079°22'53.88"          to
+                                                                            N43°36'29.36" W079°30'03.80"          thence counter-clockwise along the arc of a circle of
+
+
+
+
+                                                                                                                                                                                          Effective 0901Z 29 OCTOBER 2026 to 0901Z 24 DECEMBER 2026
+                                                                                                                                                                                                                           DESIGNATED AIRSPACE HANDBOOK
+                                                                            7 miles                               radius centred on
+                                                                            N43°40'38.00" W079°37'50.00"          (Toronto/Lester B. Pearson Intl, ON - AD) \ to
+                                                                            N43°41'27.90" W079°28'15.56"          to
+                                                                            N43°42'24.32" W079°23'53.91"          to
+                                                                            N43°43'30.37" W079°24'07.83"          to
+                                                                            N43°44'38.30" W079°18'37.97"          to
+                                                                            N43°40'16.11" W079°16'48.00"          to
+                                                                            N43°37'32.49" W079°16'53.05"          thence clockwise along the arc of a circle of
+                                                                            5 miles                               radius centred on
+                                                                            N43°37'39.00" W079°23'46.00"          (Billy Bishop Toronto City Airport, ON - AD) \ to
+                                                                            N43°32'41.36" W079°22'53.88"          point of beginning
+
+                                                           3.4.4-8    Toronto/Lester B. Pearson Intl, ON:
+                                                           3.4.4-9    The airspace to 2500´ (1900´ AAE) within the area bounded by a circle of 7 miles radius centred on the following:
+                                                                            N43°40'38.00" W079°37'50.00"          (Toronto/Lester B. Pearson Intl, ON - AD)
+
+
+                                                           3.4.4-10   Class D
+                                                           3.4.4-11   Hamilton, ON:
+                                                           3.4.4-12   The airspace to 4500´ (3700´ AAE) within the area bounded by a line beginning at:
+                                                                            N43°03'36.12" W079°53'54.37"          to
+                                                                            N43°07'32.63" W080°04'49.23"          thence clockwise along the arc of a circle of
+                                                                            7 miles                               radius centred on
+                                                                            N43°10'25.00" W079°56'06.00"          (Hamilton, ON - AD)\ to
+                                                                            N43°03'36.12" W079°53'54.37"          point of beginning
+
+                                                           3.4.5      TRANSPONDER AIRSPACE
+                                                           5.1   DANGER AREAS
+                                                                    CYR141 MATSQUI, BC (Abbotsford, BC)
+                                                                    The airspace within the area bounded by lines tangent to circles of:
+                                                                          0.8 mile                            radius centred on
+                                                                          N49°01'35.00" W122°18'10.00"        and
+                                                                          N49°01'10.00" W122°18'05.00"
+                                                                    Designated Altitude             – Surface to 300´
+                                                                    Time of Designation             – Cont
+                                                                    User/Controlling Agency         – Warden, Pacific Institution (604) 870-7755
+                                                                    Operating Procedures            – No person shall operate an aircraft within the area described unless the
+                                                                                                      flight has been authorized by the User/Controlling Agency.
+
+                                                                    CYR501 MEAFORD RANGE, ON
+                                                                    The airspace within the area bounded by a line beginning at:
+                                                                          N44°42'48.00"   W080°46'11.00"         to
+                                                                          N44°44'40.00"   W080°46'22.00"         to
+                                                                          N44°44'40.00"   W080°39'32.00"         to
+                                                                          N44°44'25.00"   W080°37'17.00"         to
+                                                                          N44°42'50.00"   W080°35'45.00"         to
+                                                                          N44°41'11.00"   W080°35'35.00"         to
+                                                                          N44°39'45.00"   W080°37'41.00"         to
+
+                                                                                                                      147
+                                                                                                                                           DAH    September 21, 2026 11:44 am
+                                                           RESTRICTED AREAS                                                                          CYR502 CFB BORDEN, ON
+
+
+                                                                          N44°37'40.00" W080°43'40.00"        to
+© 2026 His Majesty the King in Right of Canada
+
+
+
+
+                                                                          N44°42'48.00" W080°46'11.00"        point of beginning
+                                                                    Designated Altitude             – Surface to 12,000´
+                                                                    Time of Designation             – Cont
+
+
+
+
+                                                                                                                                                                                 Effective 0901Z 29 OCTOBER 2026 to 0901Z 24 DECEMBER 2026
+                                                                                                                                                                                                                  DESIGNATED AIRSPACE HANDBOOK
+                                                                    Designated Altitude             – Above 12,000´ to 15,000´
+                                                                    Time of Designation             – Ocsl by NOTAM
+                                                                    User Agency                     – MTFC Meaford Range Control (519) 538-1371 Ext 6738/6991
+                                                                                                      (CSN) 260-6738/6991
+                                                                    Controlling Agency              – Toronto ACC (905) 676-4509
+                                                                    Operating Procedures            – No person shall operate an aircraft within the area described unless the
+                                                                                                      flight has been authorized by the User/Controlling Agency.
+
+                                                                    CYR502 CFB BORDEN, ON
+                                                                    The airspace within the area bounded by a line beginning at:
+                                                                          N44°20'00.00" W079°59'00.00"        to
+                                                                          N44°20'00.00" W079°54'00.00"        to
+                                                                          N44°17'00.00" W079°54'00.00"        to
+                                                                          N44°16'00.00" W079°56'00.00"        to
+                                                                          N44°15'30.00" W079°59'00.00"        to
+                                                                          N44°20'00.00" W079°59'00.00"        point of beginning
+                                                                    Designated Altitude             – Surface to 7000´
+                                                                    Time of Designation             – Cont
+                                                                    User/Controlling Agency         – Base Ops/Duty Watch Officer (705) 424-1200 Ext 1381/2445
+                                                                                                      (CSN) 270-1381/2445, Range Control 24/7 (CSN) 270-2164
+                                                                    Operating Procedures            – No person shall operate an aircraft within the area described unless the
+                                                                                                      flight has been authorized by the User/Controlling Agency.
+
+                                                                    CYR504 JOYCEVILLE, ON
+                                                                    The airspace within the area bounded by a circle of:
+                                                                          1 mile                              radius centred on
+                                                                          N44°21'30.00" W076°21'10.00"
+                                                                    Designated Altitude             – Surface to 1400´
+                                                                    Time of Designation             – Cont
+                                                                    User/Controlling Agency         – Warden, Joyceville Institution (613) 542-4554
+                                                                    Operating Procedures            – No person shall operate an aircraft within the area described unless the
+                                                                                                      flight has been authorized by the User/Controlling Agency.
+

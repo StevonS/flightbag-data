@@ -6,7 +6,7 @@ published as GitHub releases. Not for primary navigation.
 | File | Contents | Source | Updated |
 | --- | --- | --- | --- |
 | `<chart>.mbtiles` | FAA VFR sectional, clipped, WebP tiles, zoom 5–11 | [FAA digital VFR charts](https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/vfr/) (public domain) | 56 days |
-| `airspace.json.gz` | US Class B, C and D airspace | [FAA AIS open data](https://adds-faa.opendata.arcgis.com/) (public domain) | 28 days |
+| `airspace.json.gz` | US Class B, C and D airspace; Canadian control zones and Class F (CYR, CYD, CYA) areas | [FAA AIS open data](https://adds-faa.opendata.arcgis.com/) (public domain); NAV CANADA [Designated Airspace Handbook](https://www.navcanada.ca/en/aeronautical-information/operational-guides-and-publications.aspx) (Source of Canadian Airspace Data © Transport Canada) | 28 / 56 days |
 | `airports.json.gz` | Canadian and US airports, runways, frequencies | [OurAirports](https://ourairports.com/data/) (public domain, unofficial) | 28 days |
 | `manifest.json` | Index of the files above with editions, expiry dates and SHA-256 | — | each release |
 
@@ -44,3 +44,13 @@ licence (see `clipshapes/LICENSE-chartmaker`).
 ## Licence
 
 Code: MIT. Data: public domain sources as listed above.
+
+## Canadian airspace
+
+`pipeline/build_dah.py` reads the Designated Airspace Handbook (converted
+with `pdftotext -layout`) and turns control-zone and Class F descriptions
+into polygons: circles, lines and arcs, and areas bounded by lines tangent
+to two circles. Boundaries that follow a border or shoreline, or that have
+exclusions, are drawn with straight lines and marked `"approx": true`.
+Terminal control areas, transition areas and Class E airways are not
+included yet.

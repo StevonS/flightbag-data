@@ -5,7 +5,15 @@ from pathlib import Path
 
 import pytest
 
-from pipeline import build_airports, build_airspace, charts, cycle, manifest, plan
+from pipeline import (
+    build_airports,
+    build_airspace,
+    build_dah,
+    charts,
+    cycle,
+    manifest,
+    plan,
+)
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -250,3 +258,79 @@ def test_rings_stay_closed_after_simplification():
     ring = build_airspace._round_ring(circle)
     assert ring[0] == ring[-1]
     assert 20 < len(ring) < 200
+
+
+# --- Designated Airspace Handbook (Canada) -----------------------------------
+
+
+def _inside(ring, lon, lat):
+    c = False
+    for (x1, y1), (x2, y2) in zip(ring, ring[1:]):
+        if (y1 > lat) != (y2 > lat) and lon < (x2 - x1) * (lat - y1) / (y2 - y1) + x1:
+            c = not c
+    return c
+
+
+def test_dah(tmp_path):
+    out = tmp_path / "dah.json"
+    summary = build_dah.build(FIXTURES / "dah_excerpt.txt", out)
+    data = json.loads(out.read_text())
+    assert data["effective"] is None or "2026" in data["effective"]
+    items = {a["name"]: a for a in data["airspace"]}
+    assert summary["controlZones"] == 6
+
+    # Circle: 5 NM around the aerodrome, surface to 4000 ft.
+    cykf = items["Kitchener/Waterloo, ON"]
+    assert (cykf["cls"], cykf["kind"]) == ("C", "CZ")
+    assert cykf["lower"] == {"ref": "SFC"}
+    assert cykf["upper"] == {"ft": 4000, "ref": "MSL"}
+    ring = cykf["polygons"][0][0]
+    assert _inside(ring, -80.3786, 43.4608)  # the airport
+    assert not _inside(ring, -80.3786, 43.56)  # 6 NM north
+
+    # Lines and arcs: Billy Bishop contains CYTZ but not Pearson.
+    cytz = items["Toronto/Billy Bishop Toronto City Airport, ON"]["polygons"][0][0]
+    assert _inside(cytz, -79.3962, 43.6275)
+    assert not _inside(cytz, -79.6306, 43.6772)
+
+    assert items["Hamilton, ON"]["cls"] == "D"
+    # Paragraph number printed apart from its text.
+    assert items["Moose Jaw, SK"]["upper"] == {"ft": 8000, "ref": "MSL"}
+
+    # Class F: two designations merge to the full range.
+    meaford = items["MEAFORD RANGE, ON"]
+    assert (meaford["kind"], meaford["ident"]) == ("CYR", "CYR501")
+    assert meaford["lower"] == {"ref": "SFC"}
+    assert meaford["upper"] == {"ft": 15000, "ref": "MSL"}
+    assert meaford["times"] == "Cont; Ocsl by NOTAM"
+    assert items["JOYCEVILLE, ON"]["upper"] == {"ft": 1400, "ref": "MSL"}
+    # Lines tangent to two circles become their hull.
+    matsqui = next(a for a in data["airspace"] if a["ident"] == "CYR141")
+    assert len(matsqui["polygons"][0][0]) > 10
+
+
+def test_dah_limits():
+    assert build_dah.limits_cz("The airspace from 2000´ to 6000´ (5700´ AAE) within") == (
+        {"ft": 2000, "ref": "MSL"},
+        {"ft": 6000, "ref": "MSL"},
+    )
+    assert build_dah.limits_cz("The airspace to below 700´ AGL within") == (
+        {"ref": "SFC"},
+        {"ft": 700, "ref": "AGL"},
+    )
+    assert build_dah.limits_f(["Surface to FL180"]) == ({"ref": "SFC"}, {"ft": 18000, "ref": "MSL"})
+    assert build_dah.limits_f(["Above 12,000´ to Unlimited"]) == (
+        {"ft": 12000, "ref": "MSL"},
+        {"ref": "UNL"},
+    )
+
+
+def test_airspace_with_dah(tmp_path):
+    dah = tmp_path / "dah.json"
+    build_dah.build(FIXTURES / "dah_excerpt.txt", dah)
+    meta = build_airspace.build(FIXTURES / "class_airspace.geojson", tmp_path / "out", dah)
+    items = _read_gz(tmp_path / "out" / "airspace.json.gz")["airspace"]
+    assert meta["byClass"]["CYR"] == 4
+    assert "Designated Airspace Handbook" in meta["source"]
+    # Class F areas are drawn last, on top.
+    assert items[-1]["cls"] == "F"

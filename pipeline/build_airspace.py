@@ -1,7 +1,9 @@
-"""Build airspace.json.gz (US Class B, C and D) from the FAA AIS open data
-Class Airspace layer (GeoJSON).
+"""Build airspace.json.gz: US Class B, C and D from the FAA AIS open data
+Class Airspace layer (GeoJSON), plus Canadian control zones and Class F
+areas from the Designated Airspace Handbook when given (see build_dah).
 
 Usage: python -m pipeline.build_airspace <class_airspace.geojson> <out dir>
+       [<dah.json>]
 """
 
 from __future__ import annotations
@@ -138,7 +140,7 @@ def polygons(geometry: dict) -> list[list]:
     return result
 
 
-def build(geojson_path: Path, out_dir: Path) -> dict:
+def build(geojson_path: Path, out_dir: Path, dah_path: Path | None = None) -> dict:
     data = json.loads(geojson_path.read_text(encoding="utf-8"))
     features = data.get("features", [])
     print(f"{len(features)} features in source")
@@ -159,6 +161,7 @@ def build(geojson_path: Path, out_dir: Path) -> dict:
         out_features.append(
             {
                 "cls": cls,
+                "kind": "US",
                 "name": str(_get(props, "NAME") or "").strip(),
                 "ident": str(_get(props, "IDENT", "ICAO_ID") or "").strip(),
                 "lower": limit(props, "LOWER"),
@@ -171,18 +174,28 @@ def build(geojson_path: Path, out_dir: Path) -> dict:
     if not out_features:
         raise SystemExit("No Class B/C/D airspace found; check the schema above")
 
-    # Draw order: D under C under B.
-    out_features.sort(key=lambda f: ("DCB".index(f["cls"]), f["name"]))
+    sources = ["FAA AIS open data (US)"]
+    if dah_path is not None:
+        dah = json.loads(dah_path.read_text(encoding="utf-8"))
+        out_features.extend(dah["airspace"])
+        sources.append(
+            f"NAV CANADA Designated Airspace Handbook (Canada, effective "
+            f"{dah.get('effective')}); Source of Canadian Airspace Data "
+            "© Transport Canada"
+        )
+
+    # Draw order: E under D under C under B, Class F areas on top.
+    out_features.sort(key=lambda f: ("EDCBF".index(f["cls"]), f["name"]))
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / "airspace.json.gz"
     payload = json.dumps(
-        {"source": "FAA AIS open data", "airspace": out_features},
+        {"source": "; ".join(sources), "airspace": out_features},
         separators=(",", ":"),
     ).encode()
     with gzip.GzipFile(out, "wb", mtime=0) as gz:
         gz.write(payload)
 
-    counts = Counter(f["cls"] for f in out_features)
+    counts = Counter(f.get("kind", "US") if f["cls"] == "F" else f["cls"] for f in out_features)
     meta = {
         "id": "airspace",
         "file": out.name,
@@ -190,7 +203,7 @@ def build(geojson_path: Path, out_dir: Path) -> dict:
         "byClass": dict(sorted(counts.items())),
         "sizeBytes": out.stat().st_size,
         "sha256": hashlib.sha256(out.read_bytes()).hexdigest(),
-        "source": "FAA AIS open data (US only)",
+        "source": "; ".join(sources),
     }
     (out_dir / "airspace.meta.json").write_text(json.dumps(meta, indent=2))
     print(json.dumps(meta, indent=2))
@@ -198,6 +211,10 @@ def build(geojson_path: Path, out_dir: Path) -> dict:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) not in (3, 4):
         sys.exit(__doc__)
-    build(Path(sys.argv[1]), Path(sys.argv[2]))
+    build(
+        Path(sys.argv[1]),
+        Path(sys.argv[2]),
+        Path(sys.argv[3]) if len(sys.argv) == 4 else None,
+    )
